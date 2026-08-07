@@ -1,6 +1,6 @@
 # OpenCodex 多模型智能路由规则（公开脱敏版）
 
-版本：2026-08-07
+版本：2026-08-07（阅读路径优化）
 
 这是一套面向 macOS + ChatGPT.app Codex 的“指导式智能路由”配置。它把一个任务交给 GPT-5.6 Sol max 统一编排，再按工作性质调用产品、技术实现和前端视觉专家：
 
@@ -17,6 +17,77 @@
 > `OPENAI_CODEX_BASE_URL`、`KIMI_CODE_BASE_URL`、`CLAUDE_FABLE_BASE_URL`、
 > `UPSTREAM_PROXY_URL`。克隆后请在目标设备的本地私密配置中填写真实值，
 > 不要把真实 URL、IP 或密钥回填到 Git；没有上游代理时删除模板中的 `proxy` 行。
+
+## 先看效果：你只需要正常说话
+
+安装完成后，你不需要记住四个模型的分工，也不需要每次手动切换。直接在 ChatGPT.app 的 Codex 里描述目标，Sol max 会负责拆解任务、确定技术路线，并把合适的工作交给对应角色：
+
+| 你想做的事 | 系统会怎么协作 | 你最终拿到的结果 |
+| --- | --- | --- |
+| “帮我把这个想法做成产品” | Fable 先补齐需求和验收标准，Sol 再定架构 | 可执行的产品方案和技术计划 |
+| “把这个功能写出来并测试” | Sol 定边界，Luna 负责代码、调试和测试 | 可运行的实现、测试结果和风险说明 |
+| “先做一个页面原型，再落地前端” | K3 负责原型/UI/交互，Luna 负责工程实现 | 原型方向、前端代码和验收要点 |
+| “评审这份 PRD 或技术方案” | Fable 做产品评审，Sol 做技术风险审查 | 问题清单、优先级和下一步行动 |
+
+典型协作链路是：**产品定义 → 技术架构 → 代码实现 → 原型/前端 → Sol 汇总**。混合任务会按依赖拆成多个自包含子任务；关键任务仍可显式指定 `provider/model`，不会把“模型引导式路由”伪装成硬编码分类器。
+
+## 最短使用路径：让 AI 帮你安装
+
+这套方案适合已登录 ChatGPT.app、使用 macOS Codex，并且拥有 Kimi 与 Claude-compatible provider 访问权限的设备。公开仓库只提供模板，不提供任何账号、密钥或私有 endpoint。
+
+### 方式一：把下面这段交给 Codex/Claude Code 等安装型 AI
+
+复制后，把它发给你信任的本机 AI，并允许它执行终端检查；涉及密钥、私有 endpoint 或覆盖现有配置时，让它先向你确认：
+
+```text
+请阅读并按照这个公开仓库安装 OpenCodex 多模型智能路由：
+https://github.com/Albert0919/opencodex-smart-routing-rules
+
+目标设备是 macOS + ChatGPT.app Codex。请先只读检查系统、ChatGPT.app 登录态、Node.js、ocx、现有 ~/.opencodex/config.json 和 ~/.codex/config.toml，先备份再改动，不要覆盖无关配置。
+
+安装目标：
+1. GPT-5.6 Sol max 作为主代理和技术架构师；
+2. Claude Fable 5 负责 PRD、用户故事、优先级和产品评审；
+3. GPT-5.6 Luna max 负责代码实现、调试、测试和代码评审；
+4. Kimi K3 负责原型、UI、前端、交互和视觉；k3[1m] 不可用时降级为 k3。
+
+安全要求：
+- 只使用仓库中的脱敏模板；真实 endpoint 和 API key 只写入本机私密环境变量或 Keychain；
+- 不要在聊天、终端输出、Git、日志或提交中打印/保存密钥；
+- 不要复制旧设备的 auth.json、历史、shim、运行时路径或日志；
+- 发现需要真实凭据或私有 endpoint 时先停下来向我确认。
+
+完成后执行配置语法检查、ocx health，以及 Sol/Fable/Luna/K3 各一个最小冒烟请求；最后只报告通过/失败、脱敏错误和回滚方式。
+```
+
+AI 安装完成后，回到 ChatGPT.app，直接用自然语言提问即可。例如：“我想做一个带后台的报名小程序，先给我产品方案，再拆技术实现。”
+
+### 方式二：自己安装
+
+按下面顺序即可，不必先读完整架构：
+
+1. 下载仓库中的 `opencodex-config.template.json`、`opencodex-endpoints.env.example` 和环境变量示例。
+2. 在目标设备本地填入 endpoint 和 key，执行 `chmod 600`；不要把填写后的文件提交回 Git。
+3. 按“[新设备迁移步骤](#7-新设备迁移步骤)”安装 OpenCodex、合并 Sol 默认值并启动 `ocx`。
+4. 按“[验收清单](#8-验收观测与回滚)”完成四路由冒烟测试。
+
+### 安装前你需要准备什么
+
+- ChatGPT.app：已登录并能正常使用 Codex。
+- Kimi：可用的 Coding API key 和你所在设备可访问的 endpoint。
+- Claude Fable：可用的 API key、兼容 `/v1/messages` 的 endpoint 和受信证书链。
+- 可选网络代理：只在目标设备需要时填写 `UPSTREAM_PROXY_URL`。
+
+## 安装后怎么使用
+
+正常任务不需要手动写模型名：
+
+- 想做产品：说清楚目标用户、场景和约束，让 Fable 先产出产品定义。
+- 想写代码：说清楚输入、输出、技术栈和验收标准，让 Sol 拆解后交给 Luna 实现。
+- 想做页面：说明页面目标、参考风格和交互，让 K3 先做原型/前端方向。
+- 想做复杂项目：直接描述最终目标，Sol 会按“产品 → 架构 → 实现 → UI”组织协作。
+
+只有在关键任务需要强制指定 provider/model 时，才使用完整模型名，例如 `openai/gpt-5.6-luna`、`kimi-code/k3` 或 `claude-fable/claude-fable-5`。
 
 ## 1. 背景与要解决的问题
 
