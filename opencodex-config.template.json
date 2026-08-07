@@ -1,0 +1,71 @@
+{
+  "port": 10100,
+  "proxy": "${UPSTREAM_PROXY_URL}",
+  "providers": {
+    "openai": {
+      "adapter": "openai-responses",
+      "baseUrl": "${OPENAI_CODEX_BASE_URL}",
+      "codexAccountMode": "pool",
+      "authMode": "forward"
+    },
+    "kimi-code": {
+      "adapter": "openai-chat",
+      "baseUrl": "${KIMI_CODE_BASE_URL}",
+      "authMode": "key",
+      "apiKey": "${KIMI_CODE_API_KEY}",
+      "defaultModel": "k3[1m]",
+      "models": [
+        "k3[1m]",
+        "k3"
+      ],
+      "selectedModels": [
+        "k3[1m]",
+        "k3"
+      ],
+      "liveModels": false
+    },
+    "claude-fable": {
+      "adapter": "anthropic",
+      "baseUrl": "${CLAUDE_FABLE_BASE_URL}",
+      "authMode": "key",
+      "apiKey": "${CLAUDE_FABLE_API_KEY}",
+      "defaultModel": "claude-fable-5",
+      "models": [
+        "claude-fable-5"
+      ],
+      "selectedModels": [
+        "claude-fable-5"
+      ],
+      "liveModels": false,
+      "modelContextWindows": {
+        "claude-fable-5": 1000000
+      },
+      "modelReasoningEfforts": {
+        "claude-fable-5": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "modelDefaultReasoningEfforts": {
+        "claude-fable-5": "max"
+      }
+    }
+  },
+  "defaultProvider": "openai",
+  "openaiProviderTierVersion": 2,
+  "multiAgentMode": "v2",
+  "multiAgentGuidanceEnabled": true,
+  "subagentModels": [
+    "openai/gpt-5.6-luna",
+    "kimi-code/k3[1m]",
+    "kimi-code/k3",
+    "claude-fable/claude-fable-5"
+  ],
+  "injectionPrompt": "You are the GPT-5.6 Sol max lead orchestrator and technical architect. Own task classification, technical architecture, decomposition, risk decisions, and final synthesis. Delegate substantive work through spawn_agent when useful. Route product discovery, PRD, user stories, user journeys, prioritization, acceptance criteria, and product review -> use model \"claude-fable/claude-fable-5\" with reasoning_effort \"max\" as the product manager; Fable is not the code executor. Use the bare model id for this custom Anthropic endpoint; do not append the Claude client-side [1M] marker to the wire model. Route implementation, backend, code review, debugging, and tests -> use model \"openai/gpt-5.6-luna\" with reasoning_effort \"max\". Route prototype, UI, frontend, interaction, and visual design -> use model \"kimi-code/k3[1m]\" with reasoning_effort \"max\" (if the 1M variant is unavailable, use \"kimi-code/k3\"). For mixed tasks, split work into self-contained child tasks and sequence product definition, architecture, implementation, and UI work as appropriate. Whenever overriding model or reasoning_effort, set fork_turns to \"none\" and make the child task self-contained; never send a full-history fork to routed Kimi or Claude providers. Prefer explicit provider/model selection for critical work, use the documented fallback when a model is unavailable, and synthesize child results in the parent turn. This is guidance-based routing rather than a hard-coded classifier. {{roster}} {{fallback}}",
+  "websockets": true,
+  "codexAutoStart": true,
+  "codexShimAutoRestore": true
+}

@@ -1,0 +1,19 @@
+#!/bin/sh
+# Non-interactive OpenCodex startup hook for codex-shim/service launches.
+# Keep the ini files outside this ZIP, chmod 600, and never log their values.
+
+if [ -r "$HOME/.opencodex/endpoints.env" ]; then
+  # This private file contains device-specific endpoint values. The repository
+  # only ships opencodex-endpoints.env.example with placeholders.
+  . "$HOME/.opencodex/endpoints.env"
+fi
+
+if [ -r "$HOME/Downloads/kimi.ini" ]; then
+  KIMI_CODE_API_KEY="$(awk -F: 'tolower($1) ~ /^[[:space:]]*apikey[[:space:]]*$/ {sub(/^[^:]*:/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print; exit}' "$HOME/Downloads/kimi.ini")"
+  [ -n "$KIMI_CODE_API_KEY" ] && export KIMI_CODE_API_KEY
+fi
+
+if [ -r "$HOME/Downloads/claude.ini" ]; then
+  CLAUDE_FABLE_API_KEY="$(awk -F: 'tolower($1) ~ /^[[:space:]]*apikey[[:space:]]*$/ {sub(/^[^:]*:/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print; exit}' "$HOME/Downloads/claude.ini")"
+  [ -n "$CLAUDE_FABLE_API_KEY" ] && export CLAUDE_FABLE_API_KEY
+fi

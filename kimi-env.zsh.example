@@ -1,0 +1,8 @@
+# Optional zsh snippet for the target Mac.
+# It reads a local kimi.ini and exports the key without putting the key in config.json.
+# Keep kimi.ini outside this ZIP, chmod 600, and never commit it.
+
+if [ -r "$HOME/Downloads/kimi.ini" ]; then
+  KIMI_CODE_API_KEY="$(awk -F: 'tolower($1) ~ /^[[:space:]]*apikey[[:space:]]*$/ {sub(/^[^:]*:/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print; exit}' "$HOME/Downloads/kimi.ini")"
+  [ -n "$KIMI_CODE_API_KEY" ] && export KIMI_CODE_API_KEY
+fi

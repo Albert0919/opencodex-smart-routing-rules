@@ -1,0 +1,4 @@
+# Merge these top-level keys into the target machine's ~/.codex/config.toml.
+# Do not replace the whole file; keep the target machine's projects, MCP, hooks, and skills.
+model = "gpt-5.6-sol"
+model_reasoning_effort = "max"

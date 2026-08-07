@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+*.log
+*.jsonl
+auth.json
+responses-state.json
+*.ini
+*.key
+*.pem
+endpoints.env
+provider-env.sh
+config.json
+work/
+outputs/

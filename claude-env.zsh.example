@@ -1,0 +1,15 @@
+# Optional zsh snippet for the target Mac.
+# It reads a local claude.ini and exports only the provider key.
+# Keep claude.ini outside this ZIP, chmod 600, and never commit it.
+
+if [ -r "$HOME/Downloads/claude.ini" ]; then
+  CLAUDE_FABLE_API_KEY="$(awk -F: 'tolower($1) ~ /^[[:space:]]*apikey[[:space:]]*$/ {sub(/^[^:]*:/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print; exit}' "$HOME/Downloads/claude.ini")"
+  [ -n "$CLAUDE_FABLE_API_KEY" ] && export CLAUDE_FABLE_API_KEY
+fi
+
+# Do not export ANTHROPIC_BASE_URL globally when using OpenCodex. The ocx
+# launcher manages its own local proxy URL. If you run a direct Claude client,
+# set the following variables only in that command's dedicated shell:
+# export ANTHROPIC_AUTH_TOKEN="$CLAUDE_FABLE_API_KEY"
+# export ANTHROPIC_BASE_URL="${CLAUDE_FABLE_BASE_URL}"
+# export ANTHROPIC_MODEL="claude-fable-5"
