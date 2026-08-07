@@ -59,15 +59,15 @@
 
 ```mermaid
 flowchart LR
-  User[用户 / ChatGPT.app] --> Sol[GPT-5.6 Sol max\n主代理与技术架构]
-  Sol --> Fable[Claude Fable 5 max\n产品经理]
-  Sol --> Luna[GPT-5.6 Luna max\n代码落地]
-  Sol --> K3[Kimi K3 max\n原型 UI 前端]
-  User --> Gateway[OpenCodex\n<LOCAL_GATEWAY_HOST>:10100\nwebsockets=true]
-  Gateway --> OpenAI[ChatGPT.app Codex\nOpenAI Responses\nauthMode=forward]
-  Gateway --> Kimi[Kimi Coding\nOpenAI Chat\nAPI Key]
-  Gateway --> Claude[Claude-compatible endpoint\n/v1/messages\nAPI Key]
-  Gateway -. 可选 .-> NetProxy[上游网络代理\n${UPSTREAM_PROXY_URL}]
+  User["用户 / ChatGPT.app"] --> Sol["GPT-5.6 Sol max<br/>主代理与技术架构"]
+  Sol --> Fable["Claude Fable 5 max<br/>产品经理"]
+  Sol --> Luna["GPT-5.6 Luna max<br/>代码落地"]
+  Sol --> K3["Kimi K3 max<br/>原型 UI 前端"]
+  User --> Gateway["OpenCodex<br/>本地 gateway port<br/>websockets=true"]
+  Gateway --> OpenAI["ChatGPT.app Codex<br/>OpenAI Responses<br/>authMode=forward"]
+  Gateway --> Kimi["Kimi Coding<br/>OpenAI Chat<br/>API Key"]
+  Gateway --> Claude["Claude-compatible endpoint<br/>/v1/messages<br/>API Key"]
+  Gateway -.-> NetProxy["可选：上游网络代理<br/>按设备配置"]
 ```
 
 请求链路分成四层：
